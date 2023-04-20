@@ -9,15 +9,17 @@ struct Card {
     Card *next;
 };
 Card *fullDeck=NULL;
+Card* cardAt(int );
 string faces[13] = {"2","3","4","5","6","7","8","9","10","J","Q","K","A"};
 string ranks[4]={"♣","♠","♥","♦"};
+
 class Player {
     private:
         Card *Top;
         
     public:
         string name;
-        Player(string name){
+        Player(string name="Abebe"){
             this->name = name;
         }
         void fillDeck(){
@@ -45,6 +47,7 @@ class Player {
             delete temp;
         }
         Card *topCard(){
+            if (Top==NULL) return Top;
             Card* temp = Top;
             remove();
             return temp;
@@ -52,14 +55,26 @@ class Player {
         void displayCards(){
             cout<<Top->face<<" "<<Top->rank<<"\t";
         }
+
 };
+void billboard(Player *, Player *);
+void billboard(Card *, Card *);
+int compareCards(Card *, Card*);
+void War(Player *, Player *);
+
+void addCard(Card **,int , string , string );
+void addCard(Card *, Card *);
 void Play(Player *one, Player *two){
+    billboard(one,two);
     Card *first = one->topCard();
     Card *second = two->topCard();
-    one->displayCards();
-    cout<<"VS"<<"\t";
-    two->displayCards();
-    cout<<endl;
+    if (first==NULL) {cout<<two->name<<" Wins the Game!";
+        return;
+    }
+    else if (second==NULL){
+        cout<<one->name<<" Wins the Game!";
+        return;
+    }
     int res = compareCards(first,second);
     switch (res)
     {
@@ -80,16 +95,71 @@ void Play(Player *one, Player *two){
         break;
     }
 }
+void billboard(Player *one, Player *two){
+    one->displayCards();
+    cout<<"VS"<<"\t";
+    two->displayCards();
+    cout<<endl;
+}
+void billboard(Card *first, Card *second){
+    cout<<first->face<<" "<<first->rank<<"\t";
+    cout<<"VS"<<"\t";
+    cout<<second->face<<" "<<second->rank<<"\t";
+    cout<<endl;
+}
 int compareCards(Card *first, Card*second){
     if (first->num ==second->num){
         return 2;
-    } else if (first->num%13>second->num%13 || first->num ==13 && second->num !=13){
+    } else if ((((first->num)%13>(second->num)%13) || (first->num ==13)) && (second->num !=13)){
         return 0;
     } else return 1;
 
 }
 void War(Player *one, Player *two){
-
+    Card *tempone=NULL;
+    Card *temptwo=NULL;
+    Card *lastone=NULL;
+    Card *lasttwo =NULL;
+    for (int i=0;i<4;i++){
+        if (tempone==NULL &&temptwo==NULL){
+            tempone = one->topCard();
+            temptwo = two->topCard();
+        } else {
+            lastone = one->topCard();
+            lasttwo = two->topCard();
+            addCard(tempone,lastone);
+            addCard(temptwo,lasttwo);
+        }
+    }
+    billboard(lastone,lasttwo);
+    int res = compareCards(lastone,lasttwo);
+    switch (res)
+    {
+    case 0:
+        while(temptwo!=NULL){
+            one->insert(temptwo);
+            temptwo = temptwo->next;
+        }
+        while(tempone!=NULL){
+            one->insert(tempone);
+            tempone = tempone->next;
+        }
+        cout<<one->name<<" Wins this War round!"<<endl;
+        break;
+    case 1:
+        while(tempone!=NULL){
+            two->insert(tempone);
+            tempone = tempone->next;
+        }
+        while(temptwo!=NULL){
+            two->insert(temptwo);
+            temptwo = temptwo->next;
+        }
+        cout<<two->name<<" Wins this War round!"<<endl;
+        break;
+    default:
+        break;
+    }
 }
 Card* cardAt(int num){
     Card *temp;
@@ -121,6 +191,12 @@ void addCard(Card **Head,int num, string face, string rank){
         temp->next = newCard;
     }
 }
+void addCard(Card *Head, Card *card){
+    while(Head->next!=NULL){
+            Head = Head->next;
+        }
+        Head->next = card;
+}
 void display(Card *Head){
      while(Head->next!=NULL){
             cout<<Head->face<<endl;
@@ -136,6 +212,10 @@ int main(){
             addCard(&fullDeck,(13*i)+(j+1),faces[j],ranks[i]);
         }
     }
+    Player *one = new Player;
+    Player *two = new Player;
+    one->name  = "Chala";
+    Play(one,two);
     // display(fullDeck);
     return 0;
 }
