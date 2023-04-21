@@ -9,15 +9,17 @@ struct Card {
     Card *next;
 };
 Card *fullDeck=NULL;
-Card* cardAt(int );
+Card* cardAt(int, Card * );
 string faces[13] = {"2","3","4","5","6","7","8","9","10","J","Q","K","A"};
-string ranks[4]={"♣","♠","♥","♦"};
-
+// string ranks[4]={"♣","♠","♥","♦"};
+string ranks[4]={"C","S","H","D"};
+int size = 52;
 class Player {
     private:
-        Card *Top;
+        
         
     public:
+        Card *Top=NULL;
         string name;
         Player(string name="Abebe"){
             this->name = name;
@@ -25,9 +27,15 @@ class Player {
         void fillDeck(){
             srand(time(0));
             for (int i=0;i<26;i++){
-                int n = rand()%51;
-                Card* temp = cardAt(n);
+                if (size==1){
+                    insert(fullDeck);
+                }
+                else {
+                int n = rand()%(size-1);
+                Card* temp = cardAt(n,fullDeck);
                 insert(temp);
+                size--;
+                }
             }
         }
         void insert(Card *card){
@@ -75,6 +83,8 @@ void Play(Player *one, Player *two){
         cout<<one->name<<" Wins the Game!";
         return;
     }
+    first->next =NULL;
+    second->next = NULL;
     int res = compareCards(first,second);
     switch (res)
     {
@@ -92,6 +102,7 @@ void Play(Player *one, Player *two){
         War(one,two);
         break;
     default:
+    cout<<"Hello there";
         break;
     }
 }
@@ -161,18 +172,19 @@ void War(Player *one, Player *two){
         break;
     }
 }
-Card* cardAt(int num){
-    Card *temp;
-    temp = fullDeck;
+Card* cardAt(int num, Card *Deck){
+    
     for (int i=0; i<num;i++){
-        fullDeck=fullDeck->next;
+        Deck=Deck->next;
     }
     Card *wanted;
-    wanted = fullDeck->next;
-    fullDeck->next=fullDeck->next->next;
-    fullDeck = temp;
+    if (Deck->next == NULL) {
+        wanted=Deck;
+    } else {
+        wanted = Deck->next;
+        Deck->next=Deck->next->next;
+    }
     wanted->next = NULL;
-    delete temp;
     return wanted;
 }
 void addCard(Card **Head,int num, string face, string rank){
@@ -212,10 +224,14 @@ int main(){
             addCard(&fullDeck,(13*i)+(j+1),faces[j],ranks[i]);
         }
     }
-    Player *one = new Player;
+    Player *one= new Player;
     Player *two = new Player;
     one->name  = "Chala";
+    one->fillDeck();
+    two->fillDeck();
+    
+    // billboard(one,two);
     Play(one,two);
-    // display(fullDeck);
+    // display(one->Top);
     return 0;
 }
