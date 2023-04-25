@@ -66,7 +66,7 @@ class Player {
 void billboard(Player *, Player *);
 void billboard(Card *, Card *);
 int compareCards(Card *, Card*);
-void War(Card *, Card *, Player *,Player *);
+int War(Card *, Card *, Player *,Player *);
 
 void addCard(Card **,int , string , string );
 void addCard(Card *, Card *);
@@ -76,7 +76,6 @@ void Play(Player *one, Player *two){
     Card *second = NULL;
     first = one->topCard();
     second = two->topCard();
-    
     if (first==NULL) {cout<<two->name<<" Wins the Game!";
         return;
     }
@@ -91,21 +90,39 @@ void Play(Player *one, Player *two){
     switch (res)
     {
     case 0:
+        first->next = second;
+        second->next = NULL;
         one->insert(first);
         one->insert(second);
         cout<<one->name<<" Wins this round!"<<endl;
         break;
     case 1:
-        two->insert(first);
+        second->next = first;
+        first->next = NULL;
         two->insert(second);
+        two->insert(first);
         cout<<two->name<<" Wins this round!"<<endl;
         break;
     case 2:
-        War(first,second,one,two);
-        cout<<"WAR!!!!";
+        cout<<"WAR!!!!"<<endl;
+        
+        switch (War(first,second,one,two))
+        {
+        case 0:
+            one->insert(second);
+            cout<<one->name<<" Wins this War round!"<<endl;
+            break;
+        case 1:
+            two->insert(first);
+            cout<<two->name<<" Wins this War round!"<<endl;
+            break;
+        default:
+            cout<<"HI";
+            break;
+        }
         break;
     default:
-    cout<<"Hello there";
+        cout<<"Hello there";
         break;
     }
 }
@@ -132,7 +149,7 @@ int compareCards(Card *first, Card*second){
     } else return 1;
 
 }
-void War(Card *first, Card *second,Player *one, Player *two){
+int War(Card *first, Card *second,Player *one, Player *two){
     Card *tempone = first;
     Card *temptwo = second;
     Card *lastone=NULL;
@@ -150,28 +167,29 @@ void War(Card *first, Card *second,Player *one, Player *two){
     case 0:
         lasttwo->next = first;
         lastone->next = NULL;
-        while(second!=NULL){
-            one->insert(second);
-            second = second->next;
-        }
-        cout<<one->name<<" Wins this War round!"<<endl;
+        // while(second!=NULL){
+        //     one->insert(second);
+        //     second = second->next;
+        // }
+        // cout<<one->name<<" Wins this War round!"<<endl;
         break;
     case 1:
         lastone->next = second;
         lasttwo->next = NULL;
-        while(first!=NULL){
-            two->insert(first);
-            first = first->next;
-        }
+        // while(first!=NULL){
+        //     two->insert(first);
+        //     first = first->next;
+        // }
         
-        cout<<two->name<<" Wins this War round!"<<endl;
+        // cout<<two->name<<" Wins this War round!"<<endl;
         break;
     case 2:
-        War(lastone,lasttwo,one,two);
+        res = War(lastone,lasttwo,one,two);
         break;
     default:
         break;
     }
+    return res;
 }
 Card* cardAt(int num, Card *Deck){
     
