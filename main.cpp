@@ -50,9 +50,7 @@ class Player {
                 }
         }
         void remove(){
-            Card *temp = Top;
             Top = Top->next;
-            delete temp;
         }
         Card *topCard(){
             if (Top==NULL) return Top;
@@ -74,17 +72,21 @@ void addCard(Card **,int , string , string );
 void addCard(Card *, Card *);
 void Play(Player *one, Player *two){
     billboard(one,two);
-    Card *first = one->topCard();
-    Card *second = two->topCard();
-    if (first==NULL) {cout<<two->name<<" Wins the Game!";
-        return;
-    }
-    else if (second==NULL){
-        cout<<one->name<<" Wins the Game!";
-        return;
-    }
+    Card *first = NULL;
+    Card *second = NULL;
+    first = one->topCard();
+    second = two->topCard();
+    
+    // if (first==NULL) {cout<<two->name<<" Wins the Game!";
+    //     return;
+    // }
+    // else if (second==NULL){
+    //     cout<<one->name<<" Wins the Game!";
+    //     return;
+    // }
     first->next =NULL;
     second->next = NULL;
+    
     int res = compareCards(first,second);
     switch (res)
     {
@@ -99,7 +101,8 @@ void Play(Player *one, Player *two){
         cout<<two->name<<" Wins this round!"<<endl;
         break;
     case 2:
-        War(one,two);
+        // War(one,two);
+        cout<<"WAR!!!!";
         break;
     default:
     cout<<"Hello there";
@@ -119,9 +122,12 @@ void billboard(Card *first, Card *second){
     cout<<endl;
 }
 int compareCards(Card *first, Card*second){
-    if ((first->num%13) ==(second->num%13)){
+    int fir = (first->num)%13;
+    int sec = (second->num)%13;
+    if (fir ==sec){
         return 2;
-    } else if (((((first->num)%13)>((second->num)%13)) || ((first->num%13)==0)) && (second->num%13!=0)){
+    // } else if (((((first->num)%13)>((second->num)%13)) || ((first->num%13)==0)) && (second->num%13!=0)){
+    } else if (fir > sec){
         return 0;
     } else return 1;
 
@@ -223,7 +229,7 @@ int main(){
     
     for (int i=0;i<4;i++){
         for (int j=0;j<13;j++){
-            addCard(&fullDeck,(13*i)+(j+1),faces[j],ranks[i]);
+            addCard(&fullDeck,(13*i)+(j),faces[j],ranks[i]);
         }
     }
     Player *one= new Player;
