@@ -66,7 +66,7 @@ class Player {
 void billboard(Player *, Player *);
 void billboard(Card *, Card *);
 int compareCards(Card *, Card*);
-void War(Player *, Player *);
+void War(Card *, Card *, Player *,Player *);
 
 void addCard(Card **,int , string , string );
 void addCard(Card *, Card *);
@@ -77,15 +77,15 @@ void Play(Player *one, Player *two){
     first = one->topCard();
     second = two->topCard();
     
-    // if (first==NULL) {cout<<two->name<<" Wins the Game!";
-    //     return;
-    // }
-    // else if (second==NULL){
-    //     cout<<one->name<<" Wins the Game!";
-    //     return;
-    // }
-    first->next =NULL;
-    second->next = NULL;
+    if (first==NULL) {cout<<two->name<<" Wins the Game!";
+        return;
+    }
+    else if (second==NULL){
+        cout<<one->name<<" Wins the Game!";
+        return;
+    }
+    // first->next =NULL;
+    // second->next = NULL;
     
     int res = compareCards(first,second);
     switch (res)
@@ -101,7 +101,7 @@ void Play(Player *one, Player *two){
         cout<<two->name<<" Wins this round!"<<endl;
         break;
     case 2:
-        // War(one,two);
+        War(first,second,one,two);
         cout<<"WAR!!!!";
         break;
     default:
@@ -132,47 +132,42 @@ int compareCards(Card *first, Card*second){
     } else return 1;
 
 }
-void War(Player *one, Player *two){
-    Card *tempone=NULL;
-    Card *temptwo=NULL;
+void War(Card *first, Card *second,Player *one, Player *two){
+    Card *tempone = first;
+    Card *temptwo = second;
     Card *lastone=NULL;
     Card *lasttwo =NULL;
     for (int i=0;i<4;i++){
-        if (tempone==NULL &&temptwo==NULL){
-            tempone = one->topCard();
-            temptwo = two->topCard();
-        } else {
-            lastone = one->topCard();
-            lasttwo = two->topCard();
-            addCard(tempone,lastone);
-            addCard(temptwo,lasttwo);
-        }
+        tempone = one->topCard();
+        temptwo = two->topCard();
     }
+    lastone = tempone;
+    lasttwo = temptwo;
     billboard(lastone,lasttwo);
     int res = compareCards(lastone,lasttwo);
     switch (res)
     {
     case 0:
-        while(temptwo!=NULL){
-            one->insert(temptwo);
-            temptwo = temptwo->next;
-        }
-        while(tempone!=NULL){
-            one->insert(tempone);
-            tempone = tempone->next;
+        lasttwo->next = first;
+        lastone->next = NULL;
+        while(second!=NULL){
+            one->insert(second);
+            second = second->next;
         }
         cout<<one->name<<" Wins this War round!"<<endl;
         break;
     case 1:
-        while(tempone!=NULL){
-            two->insert(tempone);
-            tempone = tempone->next;
+        lastone->next = second;
+        lasttwo->next = NULL;
+        while(first!=NULL){
+            two->insert(first);
+            first = first->next;
         }
-        while(temptwo!=NULL){
-            two->insert(temptwo);
-            temptwo = temptwo->next;
-        }
+        
         cout<<two->name<<" Wins this War round!"<<endl;
+        break;
+    case 2:
+        War(lastone,lasttwo,one,two);
         break;
     default:
         break;
