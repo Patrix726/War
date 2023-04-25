@@ -119,9 +119,9 @@ void billboard(Card *first, Card *second){
     cout<<endl;
 }
 int compareCards(Card *first, Card*second){
-    if (first->num ==second->num){
+    if ((first->num%13) ==(second->num%13)){
         return 2;
-    } else if ((((first->num)%13>(second->num)%13) || (first->num ==13)) && (second->num !=13)){
+    } else if (((((first->num)%13)>((second->num)%13)) || ((first->num%13)==0)) && (second->num%13!=0)){
         return 0;
     } else return 1;
 
@@ -210,11 +210,13 @@ void addCard(Card *Head, Card *card){
         Head->next = card;
 }
 void display(Card *Head){
+     int c=1;
      while(Head->next!=NULL){
-            cout<<Head->face<<endl;
+            cout<<c<<". "<<Head->face<<" "<<Head->rank<<" "<<Head->num<<endl;
             Head = Head->next;
+            c++;
         }
-        cout<<Head->num<<endl;
+        cout<<c<<". "<<Head->face<<" "<<Head->rank<<" "<<Head->num<<endl;
 
 }
 int main(){
@@ -232,6 +234,6 @@ int main(){
     
     // billboard(one,two);
     Play(one,two);
-    // display(one->Top);
+    // display(two->Top);
     return 0;
-}
+} 
