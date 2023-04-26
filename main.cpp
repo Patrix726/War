@@ -28,11 +28,13 @@ class Player {
             srand(time(0));
             for (int i=0;i<26;i++){
                 if (size==1){
+                    fullDeck->next = NULL;
                     insert(fullDeck);
                 }
                 else {
                 int n = rand()%(size-1);
                 Card* temp = cardAt(n,fullDeck);
+                temp->next = NULL;
                 insert(temp);
                 size--;
                 }
@@ -53,7 +55,7 @@ class Player {
             Top = Top->next;
         }
         Card *topCard(){
-            if (Top==NULL) return Top;
+            if (Top==NULL) return NULL;
             Card* temp = Top;
             remove();
             return temp;
@@ -67,22 +69,35 @@ void billboard(Player *, Player *);
 void billboard(Card *, Card *);
 int compareCards(Card *, Card*);
 int War(Card *, Card *, Player *,Player *);
-
+int checkWinner(Player *, Player *);
 void addCard(Card **,int , string , string );
 void addCard(Card *, Card *);
-void Play(Player *one, Player *two){
+int Play(Player *one, Player *two){
+    switch (checkWinner(one,two)) {
+        case 1:
+            cout<<one->name<<" Wins the Game!";
+            return 1;
+            break;
+        case 2:
+            cout<<two->name<<" Wins the Game!";
+            return 2;
+            break;
+        default:
+            break;
+    }
     billboard(one,two);
     Card *first = NULL;
     Card *second = NULL;
     first = one->topCard();
     second = two->topCard();
-    if (first==NULL) {cout<<two->name<<" Wins the Game!";
-        return;
-    }
-    else if (second==NULL){
-        cout<<one->name<<" Wins the Game!";
-        return;
-    }
+    // if (first==NULL) {
+    //     cout<<two->name<<" Wins the Game!";
+    //     return 2;
+    // }else if (second==NULL){
+    //     cout<<one->name<<" Wins the Game!";
+    //     return 1;
+    // }
+    
     // first->next =NULL;
     // second->next = NULL;
     
@@ -93,28 +108,37 @@ void Play(Player *one, Player *two){
         first->next = second;
         second->next = NULL;
         one->insert(first);
-        one->insert(second);
         cout<<one->name<<" Wins this round!"<<endl;
         break;
     case 1:
         second->next = first;
         first->next = NULL;
         two->insert(second);
-        two->insert(first);
         cout<<two->name<<" Wins this round!"<<endl;
         break;
     case 2:
+        
         cout<<"WAR!!!!"<<endl;
         
         switch (War(first,second,one,two))
         {
         case 0:
-            one->insert(second);
+            one->insert(first);
             cout<<one->name<<" Wins this War round!"<<endl;
             break;
         case 1:
-            two->insert(first);
+            two->insert(second);
             cout<<two->name<<" Wins this War round!"<<endl;
+            break;
+        case 3:
+            cout<<one->name<<" Wins this War round!"<<endl;
+            cout<<one->name<<" Wins the Game!";
+            return 1;
+            break;
+        case 4:
+            cout<<two->name<<" Wins this War round!"<<endl;
+            cout<<two->name<<" Wins the Game!";
+            return 2;
             break;
         default:
             cout<<"HI";
@@ -125,6 +149,8 @@ void Play(Player *one, Player *two){
         cout<<"Hello there";
         break;
     }
+    // Play(one,two);
+    return -1;
 }
 void billboard(Player *one, Player *two){
     one->displayCards();
@@ -139,6 +165,8 @@ void billboard(Card *first, Card *second){
     cout<<endl;
 }
 int compareCards(Card *first, Card*second){
+    if (first==NULL) return 4;
+    else if (second ==NULL) return 3;
     int fir = (first->num)%13;
     int sec = (second->num)%13;
     if (fir ==sec){
@@ -149,7 +177,18 @@ int compareCards(Card *first, Card*second){
     } else return 1;
 
 }
+int checkWinner(Player *one, Player *two) {
+    if (one->Top == NULL) {
+        
+        return 2;
+    } else if (two->Top==NULL){
+        
+        return 1;
+    } 
+    return -1;
+}
 int War(Card *first, Card *second,Player *one, Player *two){
+    
     Card *tempone = first;
     Card *temptwo = second;
     Card *lastone=NULL;
@@ -160,13 +199,26 @@ int War(Card *first, Card *second,Player *one, Player *two){
     }
     lastone = tempone;
     lasttwo = temptwo;
+    switch (checkWinner(one,two)) {
+        case 1:
+            return 3;
+            break;
+        case 2:
+            return 4;
+            break;
+        default:
+            break;
+    }
     billboard(lastone,lasttwo);
     int res = compareCards(lastone,lasttwo);
+    
     switch (res)
     {
     case 0:
-        lasttwo->next = first;
-        lastone->next = NULL;
+        lastone->next = second;
+        if(lasttwo==NULL)
+            return 3;
+        lasttwo->next = NULL;
         // while(second!=NULL){
         //     one->insert(second);
         //     second = second->next;
@@ -174,8 +226,10 @@ int War(Card *first, Card *second,Player *one, Player *two){
         // cout<<one->name<<" Wins this War round!"<<endl;
         break;
     case 1:
-        lastone->next = second;
-        lasttwo->next = NULL;
+        lasttwo->next = first;
+        if(lastone==NULL)
+            return 4;
+        lastone->next = NULL;
         // while(first!=NULL){
         //     two->insert(first);
         //     first = first->next;
@@ -189,6 +243,7 @@ int War(Card *first, Card *second,Player *one, Player *two){
     default:
         break;
     }
+    
     return res;
 }
 Card* cardAt(int num, Card *Deck){
@@ -236,6 +291,7 @@ void display(Card *Head){
             c++;
         }
         cout<<c<<". "<<Head->face<<" "<<Head->rank<<" "<<Head->num<<endl;
+        // cout<<c<<endl;
 
 }
 int main(){
@@ -250,9 +306,19 @@ int main(){
     one->name  = "Chala";
     one->fillDeck();
     two->fillDeck();
+    // one->Top = fullDeck;
     
+    // two->Top = fullDeck->next;
+    // one->Top->next = NULL;
+    // two->Top->next = NULL;
+
     // billboard(one,two);
-    Play(one,two);
-    // display(two->Top);
+    int result;
+    while(result!=2 && result!=1)
+    {
+        result = Play(one,two);
+    }
+
+    // cout<<"Hello there";
     return 0;
 } 
