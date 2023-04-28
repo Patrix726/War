@@ -9,9 +9,9 @@ struct Card {
     Card *next;
 };
 Card *fullDeck=NULL;
+bool skiptoend=false;
 Card* cardAt(int, Card * );
 string faces[13] = {"2","3","4","5","6","7","8","9","10","J","Q","K","A"};
-// string ranks[4]={"♣","♠","♥","♦"};
 string ranks[4]={"C","S","H","D"};
 int size = 52;
 class Player {
@@ -20,8 +20,12 @@ class Player {
         
     public:
         Card *Top=NULL;
-        string name;
-        Player(string name="Abebe"){
+        int deck=0;
+        string name="COM";
+        Player(){
+            fillDeck();
+        }
+        void setName(string name){
             this->name = name;
         }
         void fillDeck(){
@@ -40,6 +44,18 @@ class Player {
                 }
             }
         }
+        int deckSize(){
+            return deck;
+        }
+        void updDeckSize(){
+            Card *temp = Top;
+            int c=0;
+            while (temp!=NULL) {
+                temp=temp->next;
+                c++;
+            }
+            deck = c;
+        }
         void insert(Card *card){
             if (Top==NULL){
                     Top = card;
@@ -50,9 +66,11 @@ class Player {
                 }
                 temp->next = card;
                 }
+            deck++;
         }
         void remove(){
             Top = Top->next;
+            deck--;
         }
         Card *topCard(){
             if (Top==NULL) return NULL;
@@ -75,10 +93,12 @@ void addCard(Card *, Card *);
 int Play(Player *one, Player *two){
     switch (checkWinner(one,two)) {
         case 1:
+            cout<<two->name<<" is out of Cards!"<<endl;
             cout<<one->name<<" Wins the Game!";
             return 1;
             break;
         case 2:
+            cout<<one->name<<" is out of Cards!"<<endl;
             cout<<two->name<<" Wins the Game!";
             return 2;
             break;
@@ -90,17 +110,7 @@ int Play(Player *one, Player *two){
     Card *second = NULL;
     first = one->topCard();
     second = two->topCard();
-    // if (first==NULL) {
-    //     cout<<two->name<<" Wins the Game!";
-    //     return 2;
-    // }else if (second==NULL){
-    //     cout<<one->name<<" Wins the Game!";
-    //     return 1;
-    // }
-    
-    // first->next =NULL;
-    // second->next = NULL;
-    
+
     int res = compareCards(first,second);
     switch (res)
     {
@@ -117,25 +127,30 @@ int Play(Player *one, Player *two){
         cout<<two->name<<" Wins this round!"<<endl;
         break;
     case 2:
-        
         cout<<"WAR!!!!"<<endl;
         
         switch (War(first,second,one,two))
         {
         case 0:
             one->insert(first);
+            one->updDeckSize();
+            two->updDeckSize();
             cout<<one->name<<" Wins this War round!"<<endl;
             break;
         case 1:
             two->insert(second);
+            one->updDeckSize();
+            two->updDeckSize();
             cout<<two->name<<" Wins this War round!"<<endl;
             break;
         case 3:
+            cout<<two->name<<" is out of Cards!"<<endl;
             cout<<one->name<<" Wins this War round!"<<endl;
             cout<<one->name<<" Wins the Game!";
             return 1;
             break;
         case 4:
+            cout<<one->name<<" is out of Cards!"<<endl;
             cout<<two->name<<" Wins this War round!"<<endl;
             cout<<two->name<<" Wins the Game!";
             return 2;
@@ -149,7 +164,6 @@ int Play(Player *one, Player *two){
         cout<<"Hello there";
         break;
     }
-    // Play(one,two);
     return -1;
 }
 void billboard(Player *one, Player *two){
@@ -171,7 +185,6 @@ int compareCards(Card *first, Card*second){
     int sec = (second->num)%13;
     if (fir ==sec){
         return 2;
-    // } else if (((((first->num)%13)>((second->num)%13)) || ((first->num%13)==0)) && (second->num%13!=0)){
     } else if (fir > sec){
         return 0;
     } else return 1;
@@ -179,21 +192,33 @@ int compareCards(Card *first, Card*second){
 }
 int checkWinner(Player *one, Player *two) {
     if (one->Top == NULL) {
-        
         return 2;
     } else if (two->Top==NULL){
-        
         return 1;
     } 
     return -1;
 }
 int War(Card *first, Card *second,Player *one, Player *two){
+    int n=4;
     
+    if (skiptoend==false) {
+        one->updDeckSize();
+        two->updDeckSize();
+        cout<<one->name<<" has "<<one->deck<<" cards left while ";
+        cout<<two->name<<" has "<<two->deck<<" cards left\n";
+        int bet;    
+        do {
+        cout<<"Enter the amount of cards you want to bet that is less than ";
+        bet = (one->deck<two->deck)?one->deck:two->deck;
+        cout<<bet<<": "<<endl;
+        cin>>n;
+        }while (n<1 || n>=bet);
+    }
     Card *tempone = first;
     Card *temptwo = second;
     Card *lastone=NULL;
     Card *lasttwo =NULL;
-    for (int i=0;i<4;i++){
+    for (int i=0;i<n;i++){
         tempone = one->topCard();
         temptwo = two->topCard();
     }
@@ -219,23 +244,12 @@ int War(Card *first, Card *second,Player *one, Player *two){
         if(lasttwo==NULL)
             return 3;
         lasttwo->next = NULL;
-        // while(second!=NULL){
-        //     one->insert(second);
-        //     second = second->next;
-        // }
-        // cout<<one->name<<" Wins this War round!"<<endl;
         break;
     case 1:
         lasttwo->next = first;
         if(lastone==NULL)
             return 4;
         lastone->next = NULL;
-        // while(first!=NULL){
-        //     two->insert(first);
-        //     first = first->next;
-        // }
-        
-        // cout<<two->name<<" Wins this War round!"<<endl;
         break;
     case 2:
         res = War(lastone,lasttwo,one,two);
@@ -291,11 +305,9 @@ void display(Card *Head){
             c++;
         }
         cout<<c<<". "<<Head->face<<" "<<Head->rank<<" "<<Head->num<<endl;
-        // cout<<c<<endl;
 
 }
 int main(){
-    
     for (int i=0;i<4;i++){
         for (int j=0;j<13;j++){
             addCard(&fullDeck,(13*i)+(j),faces[j],ranks[i]);
@@ -303,22 +315,32 @@ int main(){
     }
     Player *one= new Player;
     Player *two = new Player;
-    one->name  = "Chala";
-    one->fillDeck();
-    two->fillDeck();
-    // one->Top = fullDeck;
+    string pname;
+    cout<<"Enter Player Name: ";
+    cin>>pname;
+    one->setName(pname);
+    char inp;
+    do {
+        cout<<"Do you want to skip to the end? y/n\n";
+        cin>>inp;
+    }while (inp!='y' && inp!='n');
+    switch (inp)
+    {
+    case 'y':
+        skiptoend = true;
+        break;
     
-    // two->Top = fullDeck->next;
-    // one->Top->next = NULL;
-    // two->Top->next = NULL;
-
-    // billboard(one,two);
+    default:
+        break;
+    }
+    // one->fillDeck();
+    // two->fillDeck();
     int result;
     while(result!=2 && result!=1)
     {
         result = Play(one,two);
     }
-
-    // cout<<"Hello there";
+    
+    // cout<<one->deckSize();
     return 0;
 } 
