@@ -317,7 +317,7 @@ int main(){
     Player *two = new Player;
     string pname;
     cout<<"Enter Player Name: ";
-    cin>>pname;
+    getline(cin,pname);
     one->setName(pname);
     char inp;
     do {
