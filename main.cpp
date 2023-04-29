@@ -15,9 +15,6 @@ string faces[13] = {"2","3","4","5","6","7","8","9","10","J","Q","K","A"};
 string ranks[4]={"C","S","H","D"};
 int size = 52;
 class Player {
-    private:
-        
-        
     public:
         Card *Top=NULL;
         int deck=0;
@@ -43,9 +40,6 @@ class Player {
                 size--;
                 }
             }
-        }
-        int deckSize(){
-            return deck;
         }
         void updDeckSize(){
             Card *temp = Top;
@@ -307,12 +301,15 @@ void display(Card *Head){
         cout<<c<<". "<<Head->face<<" "<<Head->rank<<" "<<Head->num<<endl;
 
 }
-int main(){
+void fillDeck(){
     for (int i=0;i<4;i++){
         for (int j=0;j<13;j++){
             addCard(&fullDeck,(13*i)+(j),faces[j],ranks[i]);
         }
     }
+}
+int main(){
+    fillDeck();
     Player *one= new Player;
     Player *two = new Player;
     string pname;
@@ -324,23 +321,12 @@ int main(){
         cout<<"Do you want to skip to the end? y/n\n";
         cin>>inp;
     }while (inp!='y' && inp!='n');
-    switch (inp)
-    {
-    case 'y':
-        skiptoend = true;
-        break;
-    
-    default:
-        break;
-    }
-    // one->fillDeck();
-    // two->fillDeck();
+    inp=='y'?skiptoend=true:skiptoend=false;
     int result;
     while(result!=2 && result!=1)
     {
         result = Play(one,two);
     }
     
-    // cout<<one->deckSize();
     return 0;
 } 
